@@ -1,7 +1,8 @@
 <template>
   <div class="tweet-panal">
     <div class="panel-left">
-      <TweetList
+      <VirtualPanel :tweets="this.$store.state.tweets.home"/>
+      <!-- <TweetList
       ref="homePanel"
       :panelName="'home'"
       :isShow="selectPanelName=='home'"
@@ -32,7 +33,7 @@
         v-show="selectPanelName=='daehwa'"
         v-bind:options="this.$store.state.DalsaeOptions.uiOptions"
         v-bind:tweets="this.$store.state.tweets.daehwa"
-      />
+      /> -->
     </div>
   </div>
 </template>
@@ -40,7 +41,7 @@
 <script>
 // import Tweet from "./Tweet-flex.vue";
 import TweetList from "./Tweetlist.vue";
-
+import Virtualpanel from './VirtualPanel/VirtualPanel.vue'
 export default {
 	name: "tweetpanal",
 	data:function(){
@@ -205,6 +206,7 @@ export default {
   },
   components:{
     TweetList,
+    Virtualpanel,
   },
   props: {
   },
