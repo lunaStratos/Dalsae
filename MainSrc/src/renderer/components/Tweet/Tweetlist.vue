@@ -71,6 +71,24 @@ export default {
     }
   },
   mounted: function() {
+    this.EventBus.$on('AddTweet',(tweet)=>{
+      if(!this.isShow) return;
+      var scroller = this.$refs.scroll.$refs.scroller;
+      var scroll = scroller.getScroll();
+      console.log(scroller.getItemSize)
+      if(scroll.start!=0){
+        this.$nextTick(()=>{
+          var items=scroller.items;
+          for(var i=0 ; i< items.length - 1 ;i++){
+            if(items[i].id==tweet.id_str){
+              var size = items[i].size;
+              scroller.scrollToPosition(scroll.start+size);
+              return;
+            }
+          }
+        })
+      }
+    });
     this.EventBus.$on('LoadingTweetPanel', (vals) => {
       this.ResTweets(vals);
     });
