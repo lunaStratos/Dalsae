@@ -110,7 +110,7 @@ export default {
       try{
         var tweet = JSON.parse(json);
         if(tweet.id_str!=undefined){
-          this.$store.dispatch('AddStreaming', tweet);
+          this.$store.dispatch('AddStreaming', {'tweet':tweet, 'eventbus':this.EventBus});
         }
       }
       catch(ex){
