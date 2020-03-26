@@ -46,6 +46,7 @@ export default {
       selectIndex : 0,
       isLoading:false,
       isMoreLoading:false,
+      scroller:undefined,//가상 스크롤 내부 스크롤
     }
   },
   components:{
@@ -71,24 +72,7 @@ export default {
     }
   },
   mounted: function() {
-    this.EventBus.$on('AddTweet',(tweet)=>{
-      if(!this.isShow) return;
-      var scroller = this.$refs.scroll.$refs.scroller;
-      var scroll = scroller.getScroll();
-      console.log(scroller.getItemSize)
-      if(scroll.start!=0){
-        this.$nextTick(()=>{
-          var items=scroller.items;
-          for(var i=0 ; i< items.length - 1 ;i++){
-            if(items[i].id==tweet.id_str){
-              var size = items[i].size;
-              scroller.scrollToPosition(scroll.start+size);
-              return;
-            }
-          }
-        })
-      }
-    });
+    this.scroller = this.$refs.scroll.$refs.scroller;
     this.EventBus.$on('LoadingTweetPanel', (vals) => {
       this.ResTweets(vals);
     });
@@ -111,9 +95,19 @@ export default {
       if(this.selectIndex>=this.tweets.length){
         this.selectIndex=this.tweets.length - 1;
       }
+      this.LockScroll();
     }
   },
   methods:{
+    LockScroll(){
+      //스크롤이 영역 밖에 있을 경우 가상화 스크롤 높이는 min-item-size에 할당한 사이즈로 일단 더하고
+      //실제 렌더링 할 때 사이즈가 없는 오브젝트를 렌더링 후 사이즈를 구하는 방식이다.
+      //그러니 그냥 min-size를 + 하면 스크롤 고정이 동작 한다.
+      var scroll = this.scroller.getScroll();
+      if(scroll.start!=0){
+        this.scroller.scrollToPosition(scroll.start + 84);
+      }
+    },
     ShowContextMenu(){
       this.$refs.context.Show(undefined,this.tweets[this.selectIndex]);
       // this.$refs.list[this.selectIndex].ShowContextMenu();
