@@ -429,9 +429,7 @@ export default new Vuex.Store({
     TweetRead(state, tweet){
       tweet.isReaded=true;
     },
-    AddStreaming(state, vals){
-      var tweet=vals['tweet']
-      var EventBus = vals['eventbus'];
+    AddStreaming(state, tweet){
       var id =state.tweets.home.find(x=>x.id_str==tweet.id_str);
       var index = 0;
       if(id==undefined){//중복 넘기기
@@ -485,7 +483,6 @@ export default new Vuex.Store({
         var resTweet=TweetDataAgent.CreateResponsiveTweet(tweet);
         state.tweets.home.splice(index, 0, resTweet);
         TweetDataAgent.CreateNonResponsiveTweet(resTweet, tweet);
-        EventBus.$emit('AddTweet', tweet)
       }else{
         // console.log('tweet exists')
       }
@@ -572,8 +569,8 @@ export default new Vuex.Store({
     TweetRead(context, tweet){
       context.commit('TweetRead', tweet);
     },
-    AddStreaming(context, vals){
-      context.commit('AddStreaming', vals);
+    AddStreaming(context, tweet){
+      context.commit('AddStreaming', tweet);
     },
     AddQtTweet(context, vals){
       context.commit('AddQtTweet', vals)
