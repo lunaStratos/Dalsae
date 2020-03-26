@@ -72,6 +72,11 @@ export default {
     }
   },
   mounted: function() {
+    this.EventBus.$on('ScrollMove',()=>{
+      if(!this.isShow) return;
+      console.log(this.scroller.getScroll())
+      console.log(this.scroller.$el.scrollTop)
+    });
     this.scroller = this.$refs.scroll.$refs.scroller;
     this.EventBus.$on('LoadingTweetPanel', (vals) => {
       this.ResTweets(vals);
@@ -105,7 +110,12 @@ export default {
       //그러니 그냥 min-size를 + 하면 스크롤 고정이 동작 한다.
       var scroll = this.scroller.getScroll();
       if(scroll.start!=0){
-        this.scroller.scrollToPosition(scroll.start + 84);
+        var scrollTo=scroll.start + 84;
+        console.log('scroll to: '+scrollTo+'/scrollMax: '+this.scroller.totalSize)
+        if(this.scroller.totalSize<scrollTo)//스크롤 최대값 넘는 위치로 스크롤 할 경우 스크롤 먹통 됨
+          scrollTo=this.scroller.totalSize
+        this.scroller.$el.scrollTop=scrollTo;
+        // this.scroller.scrollToPosition(scrollTo);
       }
     },
     ShowContextMenu(){
@@ -150,8 +160,7 @@ export default {
       }
     },
     ScrollToTweet(index){//focus 되는 트윗 index에 맞게끔 스크롤을 이동 시키는 기능
-      var scroller = this.$refs.scroll.$refs.scroller;
-      var child = scroller.$children;
+      var child = this.scroller.$children;
       var nowItem=undefined;
       if(index<0) index = 0;
       else if(index>=this.tweets.length) index--;
@@ -169,12 +178,16 @@ export default {
       var panelBottom = panelPos.y + panelPos.height;
 
       if( tweetBottom > panelBottom){
-        var scroll = scroller.getScroll();
+        var scroll = this.scroller.getScroll();
         var scrollTo =scroll.start + tweetBottom - panelBottom;//스크롤이 이동 값은 맨위가 0기준, top으로 계산 해야 맞음
-        scroller.scrollToPosition(scrollTo);
+        if(this.scroller.totalSize<scrollTo)//스크롤 최대값 넘는 위치로 스크롤 할 경우 스크롤 먹통 됨
+          scrollTo=this.scroller.totalSize;
+        // this.scroller.scrollToPosition(scrollTo);
+        this.scroller.$el.scrollTop=scrollTo;
+
       }
       else if(tweetPos.top < panelPos.y){
-        this.$refs.scroll.scrollToItem(index);//내려가는 건 복잡한 로직 없이 단순히 index이동만 해도 됨
+        this.scroller.scrollToItem(index);//내려가는 건 복잡한 로직 없이 단순히 index이동만 해도 됨
       }
     },
     Next(e){//키보드 아래 키

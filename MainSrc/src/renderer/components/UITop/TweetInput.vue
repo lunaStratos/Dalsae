@@ -157,6 +157,8 @@ export default {
       })
     },
     SendTweet(){
+      this.EventBus.$emit('ScrollMove')
+      return;
       if(this.tweetText.length==0 && this.arrImage.length==0) {
         return;
       }
