@@ -6,7 +6,8 @@
       <UIOptionModal v-if="isShowUIOption"/>
       <div id="main-page">
         <UITop v-bind:following="this.$store.state.following" :uiOption="this.$store.state.DalsaeOptions.uiOptions" />
-        <TweetPanel/>
+        <!-- <TweetPanel/> -->
+        <VirtualPanel/>
         <UIBottom/>
         <InputPin/>
         <UserCall/>
@@ -20,6 +21,7 @@
 </template>
 
 <script>
+import VirtualPanel from './Tweet/VirtualPanel/VirtualPanel.vue'
 import TweetPanel from "./Tweet/TweetPanel.vue"
 import UITop from "./UITop/UITop.vue";
 import UIBottom from "./UIBottom.vue"
@@ -38,6 +40,7 @@ import AccountSelectModal from './Modals/AccountSelectModal.vue'
 export default {
   name: 'landing-page',
   components: { 
+    VirtualPanel,
     TweetPanel,
     UITop,
     UIBottom,
@@ -69,6 +72,7 @@ export default {
     },
   
     StartDalsae(){
+      return;
        if(this.$store.state.Account==undefined ||this.$store.state.Account.accountList==undefined||
           this.$store.state.Account.accountList.length==0){//등록 된 계정이 없을 경우
         this.$nextTick(() =>{//이벤트에서 show가 되기 전에 focus 호출 시 focus가 되지 않는 문제가 있어서 nextTick사용
