@@ -204,7 +204,18 @@ export default {
       */
       await this.lock.acquireAsync();
       this.height += size - this.minHeight;
+      this.Render();
       this.lock.release();
+    },
+    Render(){
+      if(this.listPool[0].transform<this.prevScrollTop){
+        console.log('render~!');
+        var y=this.prevScrollTop;
+        for(var i=0,j=this.startIndex;j<=this.endIndex;i++,j++){
+          this.listPool[i].transform=y;
+          y+=this.listData[j].size;
+        }
+      }
     },
     SetData(){
       for(var i=0,j=this.startIndex;j<=this.endIndex;i++,j++){
