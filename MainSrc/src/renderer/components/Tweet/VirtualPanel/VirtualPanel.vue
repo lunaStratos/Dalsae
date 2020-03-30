@@ -166,8 +166,9 @@ export default {
         this.listPool.push(swap);//맨뒤에 추가
         swap.tweet=this.listData[this.endIndex];
         this.moveY-=size;
-        size = next.tweet.size;//맨 위에서 2번째 애 사이즈만큼 이동 시 index가 올라야 함
+        size = next.GetSize();//맨 위에서 2번째 애 사이즈만큼 이동 시 index가 올라야 함
       }
+      console.log(this.moveY)
     },
     ScrollUp(){//맨끝 아이템이 0번으로 감
       var size = this.listData[this.endIndex].size;
@@ -187,8 +188,23 @@ export default {
         // console.log('swap')
       }
     },
-    ChangeSize(size){
+    async ChangeSize(size){
+      //여기서 스크롤이 다량으로 이동 했을 경우 transform을 재계산 해야 된다
+      //스크롤을 왕창 이동 했을 경우 min-height로 일단 다 더한 상태기 때문에...
+      /*
+ㅇ
+ㅇ//transform계산이 이 위치에 있는 경우. 이런 건 어떻게 해야 되냐.... 
+ㅇ
+
+
+ㅁ스크린영역이 이렇지만
+ㅁ
+ㅁ
+ㅁ
+      */
+      await this.lock.acquireAsync();
       this.height += size - this.minHeight;
+      this.lock.release();
     },
     SetData(){
       for(var i=0,j=this.startIndex;j<=this.endIndex;i++,j++){
