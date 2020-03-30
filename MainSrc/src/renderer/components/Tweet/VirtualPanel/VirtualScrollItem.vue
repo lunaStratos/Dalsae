@@ -21,17 +21,15 @@ export default {
       type:Boolean,
       default:false,
     },
-    
+    minHeight:{
+      type:Number,
+      default:84,
+    }
   },
   watch:{
     tweet: {
       handler:function(newVal, oldVal){//스트리밍으로 인해 트윗이 추가 되면 index를 올려줘야함
-        if(this.tweet){
-          if(this.tweet.size==undefined){
-            this.tweet.size = Math.round(Math.random() * (200 - 84) + 84);
-            this.$parent.ChangeSize(this.tweet.size);
-          }
-        }
+        this.CreateSize();
       },
       deep:true,
     }
@@ -50,7 +48,26 @@ export default {
 
   },
   methods:{
-  
+    CreateSize(){
+      if(this.tweet){
+        if(this.tweet.size==undefined){
+          this.tweet.size = Math.round(Math.random() * (200 - 84) + 84);
+          this.$parent.ChangeSize(this.tweet.size);
+        }
+      }
+      else{
+      }
+    },
+    GetSize(){
+      if(this.tweet){
+        if(this.tweet.size){
+          return this.tweet.size
+        }
+      }
+      else{
+        return this.minHeight
+      }
+    }
   },
   components:{
     TweetSelector,

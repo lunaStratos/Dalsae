@@ -1,7 +1,7 @@
 <template>
   <div ref="panel" class="virtual-panel" @scroll="OnScroll">
     <div ref="scroller" class="virtual-scroller" :style="{'height':height+'px'}">
-      <VirtualScrollItem ref="scrollItem" v-for="index in 15" :key="index" />
+      <VirtualScrollItem ref="scrollItem" v-for="index in 15" :key="index" :minHeight="84" />
     </div>
   </div>
 </template>
@@ -9,6 +9,7 @@
 <script>
 import TweetSelector from '../TweetSelector.vue'
 import VirtualScrollItem from './VirtualScrollItem.vue'
+import AwaitLock from 'await-lock';
 export default {
   name: "virtualpanel",
   components:{
@@ -24,6 +25,7 @@ export default {
   },
 	data:function(){
 		return{
+      lock: new AwaitLock(),
       height:0,
       moveY:0,
       prevScrollTop:0,
@@ -60,7 +62,7 @@ export default {
 		}
   },
   created:function(){
-    for(var i=0;i<30;i++){
+    for(var i=0;i<2000;i++){
       var obj=new Object();
       obj.text=i.toString();
       obj.index=i;
@@ -105,8 +107,12 @@ export default {
   },
   methods:{
     OnScroll(e){//pop: 마지막 빼기 / shift: 첫번째 빼기
+      this.Scroll();
+    },
+    async Scroll(){
+      await this.lock.acquireAsync();
       var moved=this.$refs.panel.scrollTop - this.prevScrollTop;//스크롤 위, 아래 구하기 위한 식
-      this.prevScrollTop+=moved;
+      this.prevScrollTop=this.$refs.panel.scrollTop;
       this.moveY+=moved;//이동 좌표
       if(moved < 0){
         this.ScrollUp();
@@ -114,6 +120,7 @@ export default {
       else{
         this.ScrollDown();
       }
+      this.lock.release();
     },
     IndexUp(){
       if(this.endIndex + 1 < this.listData.length && (this.endIndex - this.startIndex) < 15){//pool개수만큼 차이나야 함
@@ -132,7 +139,7 @@ export default {
     },
     IndexDown(){
       if((this.endIndex - this.startIndex) < 15){//pool개수만큼 차이나야 함!!!!
-        this.endIndex--;
+        this.endIndex=14;
       }
       else{//더 이상 스왑하면 안 되는 상태
         return false;
@@ -155,7 +162,7 @@ export default {
         var swap = this.listPool.shift();//맨앞 걸 뺌
         var next = this.listPool[0];
         var last = this.listPool[this.listPool.length - 1];
-        swap.transform=last.transform + last.tweet.size;
+        swap.transform=last.transform + last.GetSize();
         this.listPool.push(swap);//맨뒤에 추가
         swap.tweet=this.listData[this.endIndex];
         this.moveY-=size;
@@ -177,6 +184,7 @@ export default {
         this.listPool.splice(0,0,swap);//맨앞에 추가
         this.moveY+=size;
         size = next.tweet.size;//맨 위에서 2번째 애 사이즈만큼 이동 시 index가 올라야 함
+        // console.log('swap')
       }
     },
     ChangeSize(size){
