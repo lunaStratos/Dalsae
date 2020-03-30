@@ -168,7 +168,6 @@ export default {
         this.moveY-=size;
         size = next.GetSize();//맨 위에서 2번째 애 사이즈만큼 이동 시 index가 올라야 함
       }
-      console.log(this.moveY)
     },
     ScrollUp(){//맨끝 아이템이 0번으로 감
       var size = this.listData[this.endIndex].size;
@@ -181,10 +180,10 @@ export default {
         var next = this.listPool[this.listPool.length - 1];//맨뒤에서 두번째 애
         var first = this.listPool[0];
         swap.tweet=this.listData[this.startIndex];
-        swap.transform=first.transform - swap.tweet.size;
+        swap.transform=first.transform - swap.GetSize();
         this.listPool.splice(0,0,swap);//맨앞에 추가
         this.moveY+=size;
-        size = next.tweet.size;//맨 위에서 2번째 애 사이즈만큼 이동 시 index가 올라야 함
+        size = next.GetSize();//맨 위에서 2번째 애 사이즈만큼 이동 시 index가 올라야 함
         // console.log('swap')
       }
     },
@@ -204,16 +203,25 @@ export default {
       */
       await this.lock.acquireAsync();
       this.height += size - this.minHeight;
-      this.Render();
+      this.Render(true);//스크롤 이동 후 화면 밖일 경우 재렌더링, 파라메터는 방향
       this.lock.release();
     },
-    Render(){
+    Render(isDown){
       if(this.listPool[0].transform<this.prevScrollTop){
         console.log('render~!');
-        var y=this.prevScrollTop;
-        for(var i=0,j=this.startIndex;j<=this.endIndex;i++,j++){
-          this.listPool[i].transform=y;
-          y+=this.listData[j].size;
+        if(isDown){
+          var y=this.prevScrollTop;
+          for(var i=0,j=this.startIndex;j<=this.endIndex;i++,j++){
+            this.listPool[i].transform=y;
+            y+=this.listData[j].size;
+          }
+        }
+        else{
+          var y = this.prevScrollTop + this.$refs.panel.clientHeight;
+          for(var i=0,j=this.startIndex;j<=this.endIndex;i++,j++){
+            this.listPool[i].transform=y;
+            y-=this.listData[j].size;
+          }
         }
       }
     },
