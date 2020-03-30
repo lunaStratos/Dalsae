@@ -63,6 +63,9 @@ export default {
         if(this.tweet.size){
           return this.tweet.size
         }
+        else{
+          return this.minHeight;
+        }
       }
       else{
         return this.minHeight
